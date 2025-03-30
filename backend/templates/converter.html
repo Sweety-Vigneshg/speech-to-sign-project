@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Character Selection</title>
+    <!-- Add these before your custom scripts -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -111,5 +114,31 @@
    <footer>
     <p>&copy; 2025 Speech to Sign Animation Converter. All Rights Reserved.</p>
   </footer>
+  
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyByIQWS4VhN_GMhGPy-o8Mp3HHZLXKAU_k",
+        authDomain: "web-development-project-site.firebaseapp.com",
+        projectId: "web-development-project-site",
+        storageBucket: "web-development-project-site.appspot.com",
+        messagingSenderId: "465762016992",
+        appId: "1:465762016992:web:7980bfae1e32186d2d7a85",
+        measurementId: "G-XSCHS71RT4"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    
+    // Authentication check
+    auth.onAuthStateChanged((user) => {
+        if (!user) {
+            // User not logged in - redirect to register page
+            window.location.href = '/register';
+        }
+        // User is logged in - no action needed
+    });
+    </script>
 </body>
 </html>
