@@ -9,6 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <style>
+        /* EXISTING CSS */
         * {
             margin: 0;
             padding: 0;
@@ -108,13 +109,77 @@
             border-radius: 5px;
             border: 1px solid #ddd;
         }
+
+        /* NEW POPUP STYLES */
+        .message-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 25px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 600px;
+            width: 90%;
+            display: none;
+        }
+
+        .message-popup.active {
+            display: block;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .popup-overlay.active {
+            display: block;
+        }
+
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .message-content {
+            max-height: 60vh;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        .message-preview {
+            cursor: pointer;
+            color: #1d2671;
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
+    <!-- EXISTING HTML -->
     <div class="admin-container">
         <h1>Admin Dashboard</h1>
         
-        <!-- Stats Overview -->
         <div class="stats-container">
             <div class="stat-card">
                 <h3>Total Users</h3>
@@ -130,14 +195,12 @@
             </div>
         </div>
 
-        <!-- Tabs -->
         <div class="tabs">
             <button class="tab-btn active" onclick="showTab('users')">Users</button>
             <button class="tab-btn" onclick="showTab('contacts')">Contacts</button>
             <input type="text" id="searchInput" class="search-box" placeholder="Search...">
         </div>
 
-        <!-- Users Table -->
         <div class="data-table" id="usersTable">
             <table>
                 <thead>
@@ -153,7 +216,6 @@
             </table>
         </div>
 
-        <!-- Contacts Table -->
         <div class="data-table" id="contactsTable" style="display: none;">
             <table>
                 <thead>
@@ -170,8 +232,18 @@
         </div>
     </div>
 
+    <!-- NEW POPUP HTML -->
+    <div class="popup-overlay" id="popupOverlay"></div>
+    <div class="message-popup" id="messagePopup">
+        <div class="popup-header">
+            <h3>Full Message</h3>
+            <button class="close-btn" onclick="closeMessagePopup()">Close</button>
+        </div>
+        <div class="message-content" id="fullMessage"></div>
+    </div>
+
     <script>
-        // Firebase initialization
+        // EXISTING FIREBASE INIT
         const firebaseConfig = {
             apiKey: "AIzaSyByIQWS4VhN_GMhGPy-o8Mp3HHZLXKAU_k",
             authDomain: "web-development-project-site.firebaseapp.com",
@@ -186,7 +258,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Check admin status
+        // EXISTING AUTH CHECK
         auth.onAuthStateChanged(async (user) => {
             if (!user) window.location.href = '/register';
             
@@ -198,28 +270,61 @@
             }
         });
 
+        // EXISTING LOAD DATA
         async function loadData() {
-            // Load users
             db.collection('Speech-to-Sign-Users').onSnapshot(async (snapshot) => {
                 const users = [];
-                snapshot.forEach(doc => {
-                    users.push({ id: doc.id, ...doc.data() });
-                });
+                snapshot.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
                 updateUsers(users);
                 document.getElementById('totalUsers').textContent = users.length;
             });
 
-            // Load contacts
             db.collection('Speech-to-Sign-Contact').onSnapshot(async (snapshot) => {
                 const contacts = [];
-                snapshot.forEach(doc => {
-                    contacts.push({ id: doc.id, ...doc.data() });
-                });
+                snapshot.forEach(doc => contacts.push({ id: doc.id, ...doc.data() }));
                 updateContacts(contacts);
                 document.getElementById('totalContacts').textContent = contacts.length;
             });
         }
 
+        // MODIFIED UPDATE CONTACTS WITH POPUP FUNCTIONALITY
+        function updateContacts(contacts) {
+            const tbody = document.getElementById('contactsList');
+            tbody.innerHTML = contacts.map(contact => `
+                <tr>
+                    <td>${contact.name}</td>
+                    <td>${contact.email}</td>
+                    <td class="message-preview" onclick="showFullMessage('${contact.id}')">
+                        ${contact.message.substring(0, 50)}${contact.message.length > 50 ? '...' : ''}
+                    </td>
+                    <td>${new Date(contact.timestamp?.toDate()).toLocaleString()}</td>
+                    <td>
+                        <button class="delete-btn" onclick="deleteContact('${contact.id}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // NEW POPUP FUNCTIONS
+        async function showFullMessage(contactId) {
+            try {
+                const doc = await db.collection('Speech-to-Sign-Contact').doc(contactId).get();
+                if (doc.exists) {
+                    document.getElementById('fullMessage').textContent = doc.data().message;
+                    document.getElementById('messagePopup').classList.add('active');
+                    document.getElementById('popupOverlay').classList.add('active');
+                }
+            } catch (error) {
+                console.error('Error fetching message:', error);
+            }
+        }
+
+        function closeMessagePopup() {
+            document.getElementById('messagePopup').classList.remove('active');
+            document.getElementById('popupOverlay').classList.remove('active');
+        }
+
+        // EXISTING FUNCTIONS (UNCHANGED)
         function updateUsers(users) {
             const tbody = document.getElementById('usersList');
             tbody.innerHTML = users.map(user => `
@@ -233,21 +338,6 @@
                             `<button class="delete-btn" onclick="deleteUser('${user.id}')">Delete</button>` : 
                             'Admin'
                         }
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function updateContacts(contacts) {
-            const tbody = document.getElementById('contactsList');
-            tbody.innerHTML = contacts.map(contact => `
-                <tr>
-                    <td>${contact.name}</td>
-                    <td>${contact.email}</td>
-                    <td>${contact.message.substring(0, 50)}...</td>
-                    <td>${new Date(contact.timestamp?.toDate()).toLocaleString()}</td>
-                    <td>
-                        <button class="delete-btn" onclick="deleteContact('${contact.id}')">Delete</button>
                     </td>
                 </tr>
             `).join('');
@@ -268,12 +358,10 @@
         function showTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.data-table').forEach(table => table.style.display = 'none');
-            
             document.getElementById(`${tabName}Table`).style.display = 'block';
             event.target.classList.add('active');
         }
 
-        // Search functionality
         document.getElementById('searchInput').addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
             filterTable(searchTerm);
