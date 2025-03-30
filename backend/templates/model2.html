@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Language to Text</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            text-align: center;
+            color: #333;
+        }
+        /* Banner Section */
+        header .banner {
+            background: linear-gradient(135deg, #1d2671, #c33764);
+            color: #fff;
+            padding: 30px;
+            text-align: center;
+        }
+        header .banner h1 {
+            font-size: 2.5em;
+            letter-spacing: 1px;
+        }
+
+        /* Navigation Bar */
+        nav {
+            background-color: #1d2671;
+            text-align: center;
+            padding: 12px 0;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 12px 20px;
+            display: inline-block;
+            font-size: 1.1em;
+            transition: 0.3s ease;
+        }
+        nav a:hover {
+            background: #c33764;
+            border-radius: 5px;
+        }
+
+        .container { max-width: 600px; margin: auto; margin-top: 20px; padding: 20px; background: white; box-shadow: 0px 0px 10px gray; border-radius: 10px; }
+        h2 { color: #333; }
+        #video-box { width: 100%; border: 2px solid black; }
+        #text-box { font-size: 22px; margin-top: 20px; font-weight: bold; color: #007bff; }
+        button { margin-top: 10px; padding: 10px 20px; font-size: 18px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 5px; }
+        button:hover { background: #0056b3; }
+         /* Footer */
+         footer {
+            margin-top: 50px;
+            background-color: #1d2671;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+     <!-- Banner at Top -->
+     <header>
+        <div class="banner">
+            <h1>Speech to Sign Animation Converter</h1>
+        </div>
+    </header>
+
+    <!-- Navigation Bar -->
+    <nav>
+        <a href="/">Home</a>
+        <a href="/converter">Speech To Sign</a>
+        <a href="/model2">Sign To Speech</a>
+        <a href="/about">About Us</a>
+        <a href="/contact">Contact Us</a>
+        <a href="/register">User Login</a>
+    </nav>
+    <div class="container">
+        <h2>Sign Language to Text</h2>
+        <img id="video-box" src="{{ url_for('video_feed') }}" alt="Webcam Feed">
+        <div id="text-box">Converted Text: </div>
+        <button onclick="speakText()">Speak</button>
+        <button onclick="stopDetection()">Stop</button>
+        <button onclick="restartDetection()">Restart</button>
+    </div>
+      <!-- Footer -->
+      <footer>
+        <p>&copy; 2025 Speech to Sign Animation Converter. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        let isRunning = true;
+
+        function updateText() {
+            if (!isRunning) return;
+            fetch('/detect_sign')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("text-box").innerHTML = "Converted Text: " + data.text;
+            });
+        }
+
+        setInterval(updateText, 1000);
+
+        function speakText() {
+            fetch('/speak')
+            .then(response => response.json())
+            .then(data => {
+                console.log("Text spoken:", data.status);
+            });
+        }
+        
+        function stopDetection() {
+            isRunning = false;
+            fetch('/stop').then(() => {
+                document.getElementById("video-box").src = "{{ url_for('static', filename='/asset/nicetomeet.gif') }}";
+                document.getElementById("text-box").innerHTML = "Thanks!";
+            });
+        }
+
+        function restartDetection() {
+            isRunning = true;
+            fetch('/restart').then(() => {
+                document.getElementById("video-box").src = "{{ url_for('video_feed') }}";
+                document.getElementById("text-box").innerHTML = "Converted Text: ";
+            });
+        }
+        function updateText() {
+            if (!isRunning) return;
+            fetch('/detect_sign')
+            .then(response => response.json())
+            .then(data => {
+            document.getElementById("text-box").innerHTML = "Converted Text: " + data.text;
+        });
+    }
+    </script>
+</body>
+</html>

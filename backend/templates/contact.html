@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us</title>
+    <style>
+        /* General Styling */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f7f7f7; 
+        }
+        /* Banner Section */
+    .banner {
+      background: linear-gradient(135deg, #1d2671, #c33764);
+      color: #fff;
+      padding: 25px 20px;
+      text-align: center;
+    }
+    .banner h1 {
+      font-size: 3em;
+    }
+
+        /* Navigation Bar */
+    nav {
+      background-color: #1d2671;
+      text-align: center;
+      padding: 10px 0;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 20px;
+      display: inline-block;
+      font-size: 1.1em;
+      transition: background 0.3s ease;
+    }
+    nav a:hover {
+      background: #c33764;
+      border-radius: 5px;
+    }
+
+        /* Contact Container */
+        .contact-container {
+            display: flex;
+            width: 80%;
+            max-width: 1000px;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            margin: 100px auto;
+        }
+
+        /* Left Section */
+        .left-section {
+            background: linear-gradient(135deg, #1d2671, #c33764);
+            color: white;
+            flex: 1;
+            padding: 50px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .left-section img {
+            width: 400px;
+            height: 350px;
+        }
+
+        /* Right Section (Form) */
+        .right-section {
+            flex: 1;
+            padding: 40px;
+        }
+
+        .right-section h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #1d2671, #c33764);
+            color: white;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background: #c33764;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            display: none;
+        }
+
+    /* Footer */
+     footer {
+      background-color: #1d2671;
+      color: #fff;
+      text-align: center;
+      padding: 5px;
+    }
+        @media (max-width: 768px) {
+            .contact-container {
+                flex-direction: column;
+            }
+
+            .left-section {
+                padding: 30px;
+            }
+
+            .right-section {
+                padding: 30px;
+            }
+
+            .left-section img {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Banner -->
+  <header>
+    <div class="banner">
+      <h1>Contact Us</h1>
+    </div>
+  </header>
+    <!-- Navigation Bar -->
+    <nav>
+        <a href="/">Home</a>
+        <a href="/converter">Speech To Sign</a>
+        <a href="/model2">Sign To Speech</a>
+        <a href="/about">About Us</a>
+        <a href="/contact">Contact Us</a>
+        <a href="/register">User Login</a>
+      </nav>
+
+    <div class="contact-container">
+        <!-- Left Side (GIF Animation) -->
+        <div class="left-section">
+            <h2>Contact Us</h2>
+            <p>We’d love to hear from you! Reach out with any questions or feedback.</p>
+            <img src="{{ url_for('static', filename='/asset/contactusgif.gif') }}" alt="Animated GIF">
+        </div>
+
+        <!-- Right Side (Form) -->
+        <div class="right-section">
+            <h2>Get in Touch</h2>
+            <form id="contactForm">
+                <input type="text" id="name" class="input-field" placeholder="Your Name">
+                <p class="error-message" id="nameError">Please enter your name</p>
+
+                <input type="email" id="email" class="input-field" placeholder="Your Email">
+                <p class="error-message" id="emailError">Please enter a valid email</p>
+
+                <textarea id="message" class="input-field" placeholder="Your Message" rows="4"></textarea>
+                <p class="error-message" id="messageError">Message cannot be empty</p>
+
+                <button type="submit" class="submit-btn">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer (Same as Index & About Us) -->
+   <footer>
+    <p>&copy; 2025 Speech to Sign Animation Converter. All Rights Reserved.</p>
+  </footer>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Clear previous errors
+            document.getElementById('nameError').style.display = 'none';
+            document.getElementById('emailError').style.display = 'none';
+            document.getElementById('messageError').style.display = 'none';
+
+            let name = document.getElementById('name').value.trim();
+            let email = document.getElementById('email').value.trim();
+            let message = document.getElementById('message').value.trim();
+            let valid = true;
+
+            // Name Validation
+            if (name === '') {
+                document.getElementById('nameError').style.display = 'block';
+                valid = false;
+            }
+
+            // Email Validation
+            if (email === '' || !email.includes('@')) {
+                document.getElementById('emailError').style.display = 'block';
+                valid = false;
+            }
+
+            // Message Validation
+            if (message === '') {
+                document.getElementById('messageError').style.display = 'block';
+                valid = false;
+            }
+
+            if (valid) {
+                alert('Message Sent Successfully!');
+                document.getElementById('contactForm').reset();
+            }
+        });
+    </script>
+
+</body>
+</html>

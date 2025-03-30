@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech to Sign Language</title>
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            text-align: center;
+            color: #333;
+        }
+
+         /* Banner Section */
+    .banner {
+      background: linear-gradient(135deg, #1d2671, #c33764);
+      color: #fff;
+      padding: 25px 20px;
+      text-align: center;
+    }
+    .banner h1 {
+      font-size: 3em;
+    }
+
+        /* Navigation Bar */
+    nav {
+      background-color: #1d2671;
+      text-align: center;
+      padding: 10px 0;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 20px;
+      display: inline-block;
+      font-size: 1.1em;
+      transition: background 0.3s ease;
+    }
+    nav a:hover {
+      background: #c33764;
+      border-radius: 5px;
+    }
+        
+        .container {
+            margin-top: 50px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            display: inline-block;
+            width: 60%;
+        }
+
+        .listen-btn {
+            padding: 12px 25px;
+            font-size: 18px;
+            background: linear-gradient(135deg, #28a745, #218838);
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        /* Updated Video Container */
+        .video-container {
+            margin: 20px auto;
+            width: 70%;
+            max-width: 700px;
+            min-height: 400px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: contain;
+            background: rgb(255, 255, 255);
+        }
+
+        /* Updated Recognized Text */
+        #recognized-text {
+            font-size: 1.2em;
+            margin: 15px 0;
+            color: #1d2671;
+            min-height: 24px;
+        }
+         /* Footer */
+      footer {
+      background-color: #1d2671;
+      color: #fff;
+      text-align: center;
+      padding: 5px;
+    }
+    </style>
+</head>
+<body>
+     <!-- Banner -->
+  <header>
+    <div class="banner">
+        <h1>Speech to Sign Animation Converter</h1>
+    </div>
+  </header>
+    <!-- Navigation Bar -->
+    <nav>
+        <a href="/">Home</a>
+        <a href="/converter">Speech To Sign</a>
+        <a href="/model2">Sign To Speech</a>
+        <a href="/about">About Us</a>
+        <a href="/contact">Contact Us</a>
+        <a href="/register">User Login</a>
+      </nav>
+
+
+      <div class="container">
+        <h1>Real-Time Speech to Sign Language</h1>
+        <button id="listen-btn" class="listen-btn">🎤 Start Listening</button>
+        <p id="recognized-text">Recognized Words: <span>-</span></p>
+        <div class="video-container">
+            <video id="signVideo" autoplay muted playsinline></video>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("listen-btn").addEventListener("click", function() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = "en-US";
+
+            recognition.onstart = () => {
+                document.getElementById("recognized-text").textContent = "🎤 Listening...";
+            };
+
+            recognition.onspeechend = () => recognition.stop();
+
+            recognition.onresult = (event) => {
+                const sentence = event.results[0][0].transcript.toLowerCase().trim();
+                document.getElementById("recognized-text").textContent = `Recognized: ${sentence}`;
+                
+                fetch(`/translate_word?word=${encodeURIComponent(sentence)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.videos?.length > 0) {
+                            playVideos(data.videos);
+                        }
+                    });
+            };
+
+            recognition.onerror = (event) => {
+                document.getElementById("recognized-text").textContent = "❌ Error: " + event.error;
+            };
+
+            recognition.start();
+        });
+
+        function playVideos(videoList) {
+            const videoElement = document.getElementById("signVideo");
+            let index = 0;
+            
+            // Speed control parameters
+            const PLAYBACK_RATE = 1.2; // 1.2x speed
+            const MIN_VIDEO_DURATION = 600; // Minimum display time in ms
+
+            function playNext() {
+                if (index >= videoList.length) return;
+
+                const videoPath = videoList[index];
+                console.log('Loading:', videoPath);
+                
+                // Add cache busting
+                const cacheBuster = `?t=${Date.now()}`;
+                videoElement.src = videoPath + cacheBuster;
+                videoElement.playbackRate = PLAYBACK_RATE;
+
+                // Force move to next video if current gets stuck
+                const safetyTimeout = setTimeout(() => {
+                    index++;
+                    playNext();
+                }, 5000); // 5s failsafe
+
+                videoElement.onloadeddata = () => {
+                    // Calculate display time based on duration
+                    const displayTime = Math.max(
+                        (videoElement.duration * 1000) / PLAYBACK_RATE,
+                        MIN_VIDEO_DURATION
+                    );
+                    
+                    // Auto-advance after calculated time
+                    setTimeout(() => {
+                        index++;
+                        playNext();
+                    }, displayTime);
+                };
+
+                videoElement.play()
+                    .then(() => {
+                        index++;
+                        clearTimeout(safetyTimeout);
+                    })
+                    .catch(error => {
+                        console.error('Play error:', error);
+                        index++;
+                        playNext();
+                    });
+            }
+
+            // Start playback chain
+            playNext();
+        }
+    </script>
+</body>
+</html>

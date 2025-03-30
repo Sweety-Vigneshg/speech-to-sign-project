@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Register</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Keep everything at the top */
+    min-height: 100vh; /* Ensure full height */
+    background: #fff;
+}
+.container {
+    width: 800px;
+    height: 500px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    display: flex;
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    position: relative;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    margin-left: auto;
+    margin-right: auto; /* Prevent overlap with the banner */
+}
+
+        /* Banner Section */
+        header {
+    width: 100%;
+}
+
+header .banner {
+    background: linear-gradient(135deg, #1d2671, #c33764);
+    color: #fff;
+    padding: 45px 20px;
+    text-align: center;
+    width: 100%;
+    position: relative;
+}
+    header .banner h1 {
+      font-size: 3em;
+    }
+    .form-container {
+    width: 50%;
+    height: auto;
+    padding: 50px;
+    transition: transform 0.6s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center content horizontally */
+    justify-content: center; /* Center content vertically */
+}
+
+        .login-form {
+            left: 0;
+            transform: translateX(0);
+        }
+        .register-form {
+            right: 0;
+            transform: translateX(100%);
+        }
+        .container.active .login-form {
+            transform: translateX(-100%);
+        }
+        .container.active .register-form {
+            transform: translateX(0);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ff416c;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #ff416c;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #ff4b2b;
+        }
+        .switch {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+        .switch a {
+            color: #ff416c;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .image-container {
+            width: 50%;
+            height: 100%;
+            background: url('/static/asset/logregpagegif.jpg') no-repeat center center/cover;
+            transition: transform 0.6s ease-in-out;
+            position: absolute;
+            left: 50%;
+        }
+        .container.active .image-container {
+            transform: translateX(-100%);
+        }
+        /* Navigation Bar */
+        nav {
+            width: 100%;
+            background-color: #1d2671;
+            text-align: center;
+            padding: 10px 0;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            display: inline-block;
+            font-size: 1.1em;
+            transition: background 0.3s ease;
+        }
+        nav a:hover {
+            background: #c33764;
+            border-radius: 5px;
+        }
+        /* Footer */
+        footer {
+            width: 100%;
+            background-color: #1d2671;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Banner at Top -->
+  <header>
+    <div class="banner">
+      <h1>User Login and Register Page</h1>
+    </div>
+  </header>
+
+    <!-- Navigation Bar -->
+    <nav>
+        <a href="/">Home</a>
+        <a href="/converter">Speech To Sign</a>
+        <a href="/model2">Sign To Speech</a>
+        <a href="/about">About Us</a>
+        <a href="/contact">Contact Us</a>
+        <a href="/register">User Login</a>
+      </nav>
+    
+    <div class="container" id="container">
+        <div class="image-container" id="image"></div>
+        <div class="form-container login-form" id="loginForm">
+            <h2>Sign In</h2>
+            <input type="email" placeholder="Email" required>
+            <input type="password" placeholder="Password" required>
+            <button>Login</button>
+            <p class="switch">Don't have an account? <a onclick="toggleForm()">Register</a></p>
+        </div>
+        <div class="form-container register-form" id="registerForm">
+            <h2>Register</h2>
+            <input type="text" placeholder="Full Name" required>
+            <input type="email" placeholder="Email" required>
+            <input type="password" placeholder="Password" required>
+            <button>Register</button>
+            <p class="switch">Already have an account? <a onclick="toggleForm()">Login</a></p>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Speech to Sign Animation Converter. All Rights Reserved.</p>
+    </footer>
+    
+    <script>
+        function toggleForm() {
+            document.getElementById("container").classList.toggle("active");
+            let image = document.getElementById("image");
+            image.style.left = image.style.left === "0%" ? "50%" : "50%";
+        }
+    </script>
+</body>
+</html>

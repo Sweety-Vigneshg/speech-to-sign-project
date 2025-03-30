@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech to Sign Language</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            text-align: center;
+            color: #333;
+        }
+
+         /* Banner Section */
+    .banner {
+      background: linear-gradient(135deg, #1d2671, #c33764);
+      color: #fff;
+      padding: 25px 20px;
+      text-align: center;
+    }
+    .banner h1 {
+      font-size: 3em;
+    }
+
+        /* Navigation Bar */
+    nav {
+      background-color: #1d2671;
+      text-align: center;
+      padding: 10px 0;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 20px;
+      display: inline-block;
+      font-size: 1.1em;
+      transition: background 0.3s ease;
+    }
+    nav a:hover {
+      background: #c33764;
+      border-radius: 5px;
+    }
+        
+        .container {
+            margin-top: 50px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            display: inline-block;
+            width: 60%;
+        }
+
+        .listen-btn {
+            padding: 12px 25px;
+            font-size: 18px;
+            background: linear-gradient(135deg, #28a745, #218838);
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .video-container {
+    margin: 20px auto;
+    width: 80%;
+    max-width: 700px;
+    height: 400px;
+    background: white; /* Background is now white */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px; /* Keeps it clean */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden; /* Ensures video stays within */
+}
+
+video {
+    width: 100%; /* Makes video fit inside the container */
+    height: auto;
+    border-radius: 10px;
+}
+ /* Footer */
+ footer {
+      background-color: #1d2671;
+      color: #fff;
+      text-align: center;
+      padding: 5px;
+    }
+
+    </style>
+</head>
+<body>
+     <!-- Banner -->
+  <header>
+    <div class="banner">
+        <h1>Speech to Sign Animation Converter</h1>
+    </div>
+  </header>
+    <!-- Navigation Bar -->
+    <nav>
+        <a href="/">Home</a>
+        <a href="/converter">Speech To Sign</a>
+        <a href="/model2">Sign To Speech</a>
+        <a href="/about">About Us</a>
+        <a href="/contact">Contact Us</a>
+        <a href="/register">User Login</a>
+      </nav>
+
+    <div class="container">
+        <h1>Real-Time Speech to Sign Language</h1>
+        <button id="listen-btn" class="listen-btn">🎤 Start Listening</button>
+        <p id="recognized-text">Recognized Words: <span>-</span></p>
+        <div class="video-container">
+            <video id="signVideo" autoplay></video>
+        </div>
+    </div>
+       
+   <footer>
+    <p>&copy; 2025 Speech to Sign Animation Converter. All Rights Reserved.</p>
+  </footer>
+
+    <script>
+        document.getElementById("listen-btn").addEventListener("click", function() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = "en-US";
+    
+            recognition.onstart = function() {
+                document.getElementById("recognized-text").innerText = "🎤 Listening...";
+            };
+    
+            recognition.onspeechend = function() {
+                recognition.stop();
+            };
+    
+            recognition.onresult = function(event) {
+                let sentence = event.results[0][0].transcript.toLowerCase();
+                document.getElementById("recognized-text").innerText = `Recognized: ${sentence}`;
+                
+                // Send recognized word to backend
+                fetch(`/translate?word=${sentence}`)
+                    .then(response => response.json())
+                    .then(data => playVideos(data.videos));
+            };
+    
+            recognition.onerror = function(event) {
+                document.getElementById("recognized-text").innerText = "❌ " + event.error;
+            };
+    
+            recognition.start();
+        });
+    
+        function playVideos(videoList) {
+            let videoElement = document.getElementById("signVideo");
+            let index = 0;
+    
+            function playNext() {
+                if (index < videoList.length) {
+                    videoElement.src = `/static/signs2/${videoList[index]}`; // Load from signs2 folder
+                    videoElement.play();
+                    index++;
+                }
+            }
+            
+            videoElement.onended = playNext;  // Play next video when one ends
+            playNext();
+        }
+    </script>
+    
+</body>
+</html>

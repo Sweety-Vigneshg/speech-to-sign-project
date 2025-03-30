@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About Us - Speech to Sign Animation Converter</title>
+  <style>
+    /* Basic Styles */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      color: #333;
+      line-height: 1.6;
+    }
+    h1, h2, h3, p {
+      margin: 0;
+      padding: 0;
+    }
+    /* Banner Section */
+    .banner {
+      background: linear-gradient(135deg, #1d2671, #c33764);
+      color: #fff;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .banner h1 {
+      font-size: 3em;
+    }
+    /* Navigation Bar */
+    nav {
+      background-color: #1d2671;
+      text-align: center;
+      padding: 10px 0;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 20px;
+      display: inline-block;
+      font-size: 1.1em;
+      transition: background 0.3s ease;
+    }
+    nav a:hover {
+      background: #c33764;
+      border-radius: 5px;
+    }
+    /* About Section */
+    .about {
+      text-align: center;
+      padding: 40px 20px;
+      background-color: #fff;
+    }
+    .about p {
+      max-width: 800px;
+      margin: 10px auto;
+      color: #555;
+      font-size: 1.2em;
+      text-align: justify;
+    }
+    /* Mission & Vision Section */
+    .mission-vision {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+      background-color: #f0f0f0;
+    }
+    .mission, .vision {
+      flex: 1 1 300px;
+      padding: 20px;
+      text-align: center;
+    }
+    .mission h2, .vision h2 {
+      color: #1d2671;
+      margin-bottom: 10px;
+    }
+    /* Icons */
+    .icon {
+     width: 50px; /* Adjust size */
+     height: 50px;
+     display: block;
+     margin: 0 auto 10px; /* Center and add spacing */
+    }
+    /* Team Section */
+    .team {
+      background-color: #e9ecef;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .team h2 {
+      margin-bottom: 20px;
+    }
+    .team-profiles {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .team-member {
+      background-color: #fff;
+      margin: 10px;
+      padding: 20px;
+      width: 250px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .team-member img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .team-member h3 {
+      margin: 10px 0 5px;
+    }
+    .team-member p {
+      margin: 0;
+      font-size: 0.9em;
+      color: #666;
+    }
+    /* Contact Section */
+    .contact {
+      text-align: center;
+      padding: 40px 20px;
+      background: #fff;
+    }
+    .contact h2 {
+      color: #1d2671;
+    }
+    .contact p {
+      max-width: 700px;
+      margin: 10px auto;
+      font-size: 1.1em;
+      color: #555;
+    }
+    /* Footer */
+    footer {
+      background-color: #1d2671;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+  </style>
+  <!-- Font Awesome for Icons -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+</head>
+<body>
+  <!-- Banner -->
+  <header>
+    <div class="banner">
+      <h1>About Us</h1>
+    </div>
+  </header>
+
+  <!-- Navigation Bar -->
+  <nav>
+    <a href="/">Home</a>
+    <a href="/converter">Speech To Sign</a>
+    <a href="/model2">Sign To Speech</a>
+    <a href="/about">About Us</a>
+    <a href="/contact">Contact Us</a>
+    <a href="/register">User Login</a>
+  </nav>
+
+  <!-- About Section -->
+  <section class="about" id="about">
+    <h2>About the Project</h2>
+    <p>Speech to Sign Animation Converter is an innovative technology that bridges the communication gap between spoken language and sign language. Using advanced AI and real-time processing, our tool converts speech into accurate and fluid sign language animations, making communication more accessible for the deaf and hard-of-hearing community.</p>
+
+    <h2>Why We Created This</h2>
+    <p>Millions of people around the world face communication barriers due to hearing impairments. Traditional sign language interpretation is not always available, creating a challenge in workplaces, schools, and public settings. We recognized this problem and wanted to create a **smart, AI-driven solution** that allows for seamless interaction between the hearing and non-hearing communities.</p>
+
+    <h2>Who We Are</h2>
+    <p>We are a team of developers, designers, and accessibility advocates passionate about **bridging the communication divide** through technology. Our goal is to make sign language translation easy, intuitive, and accessible to everyone, empowering people with the ability to connect without limitations.</p>
+  </section>
+
+  <!-- Mission & Vision Section with Icons -->
+  <section class="mission-vision">
+    <div class="mission">
+        <img src="{{ url_for('static', filename='/asset/mission.png') }}" alt="Mission Icon" class="icon">
+      <h2>Our Mission</h2>
+      <p>To provide **real-time, AI-driven sign language translation** that enables effective communication for individuals with hearing impairments, making the world a more inclusive place.</p>
+    </div>
+    <div class="vision">
+        <img src="{{ url_for('static', filename='/asset/vision.png') }}" alt="Vision Icon" class="icon">
+      <h2>Our Vision</h2>
+      <p>We envision a future where **speech-to-sign technology** is widely adopted in schools, businesses, and public spaces, allowing for universal accessibility and seamless communication.</p>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <section class="team" id="team">
+    <h2>Meet Our Team</h2>
+    <div class="team-profiles">
+      <div class="team-member">
+        <img src="{{ url_for('static', filename='/asset/developer.jpg') }}" alt="Team Member">
+        <h3>VIGNESH G</h3>
+        <p>Founder &amp; Developer</p>
+        <p>+91 8525822546</p>
+        <p>vigneshg463@gmail.com</p>
+      </div>
+      <div class="team-member">
+        <img src="{{ url_for('static', filename='/asset/developer.jpg') }}" alt="Team Member">
+        <h3>VIGNESH G</h3>
+        <p>Founder &amp; Developer</p>
+        <p>+91 8525822546</p>
+        <p>vigneshg463@gmail.com</p>
+      </div>
+      <div class="team-member">
+        <img src="{{ url_for('static', filename='/asset/developer.jpg') }}" alt="Team Member">
+        <h3>VIGNESH G</h3>
+        <p>Founder &amp; Developer</p>
+        <p>+91 8525822546</p>
+        <p>vigneshg463@gmail.com</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact" id="contact">
+    <h2>Contact Us</h2>
+    <p>If you have any questions or would like to collaborate, feel free to reach out to us.</p>
+    <p>Email: vigneshg463@gmail.com | Phone: +91 8525822546</p>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Speech to Sign Animation Converter. All Rights Reserved.</p>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("Welcome to the About Us page of Speech to Sign Animation Converter!");
+    });
+  </script>
+</body>
+</html>

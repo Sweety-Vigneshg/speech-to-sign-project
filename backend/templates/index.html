@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Speech to Sign Animation Converter</title>
+  <style>
+    /* Basic Reset & Typography */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      color: #333;
+      line-height: 1.6;
+    }
+    h1, h2, h3, p {
+      margin: 0;
+      padding: 0;
+    }
+    /* Banner Section */
+    header .banner {
+      background: linear-gradient(135deg, #1d2671, #c33764);
+      color: #fff;
+      padding: 45px 20px;
+      text-align: center;
+    }
+    header .banner h1 {
+      font-size: 3em;
+    }
+    /* Navigation Bar */
+    nav {
+      background-color: #1d2671;
+      text-align: center;
+      padding: 10px 0;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 20px;
+      display: inline-block;
+      font-size: 1.1em;
+      transition: background 0.3s ease;
+    }
+    nav a:hover {
+      background: #c33764;
+      border-radius: 5px;
+    }
+    /* Slogan Section */
+    .slogan {
+      text-align: center;
+      padding: 20px;
+      background-color: #fff;
+      font-size: 1.5em;
+      font-weight: 300;
+    }
+    /* Features Section */
+    .features .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+      background-color: #f0f0f0;
+    }
+    .features .gif {
+      flex: 1 1 300px;
+      text-align: center;
+      padding: 20px;
+    }
+    .features .gif img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .features .feature-details {
+      flex: 1 1 300px;
+      padding: 20px;
+    }
+    .features .feature-details ul {
+      list-style: none;
+      padding: 0;
+    }
+    .features .feature-details li {
+      margin-bottom: 15px;
+      position: relative;
+      padding-left: 25px;
+    }
+    .features .feature-details li:before {
+      content: "\2713";
+      position: absolute;
+      left: 0;
+      color: #1d2671;
+      font-size: 18px;
+      line-height: 1;
+    }
+    /* Call-to-Action (CTA) Section */
+    .cta {
+      background-color: #fff;
+      text-align: center;
+      padding: 40px 20px;
+      font-size: 1.8em;
+      font-weight: 300;
+    }
+    .cta img {
+      max-width: 100%;
+      display: block;
+      margin: 20px auto;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .cta button {
+      padding: 10px 20px;
+      background-color: #1d2671;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+    }
+    .cta button:hover {
+      background-color: #c33764;
+    }
+    /* How It Works Section */
+    .how-it-works {
+      text-align: center;
+      padding: 40px 20px;
+      background: #fff;
+      font-size: 1.2em;
+      font-weight: 300;
+    }
+    .how-it-works h2 {
+      font-size: 2em;
+      color: #1d2671;
+      margin-bottom: 10px;
+    }
+    .how-it-works p {
+      max-width: 700px;
+      margin: 0 auto;
+      color: #555;
+    }
+    /* Developer Section */
+    .developers {
+      background-color: #e9ecef;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .developers h2 {
+      margin-bottom: 20px;
+    }
+    .dev-profiles {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .developer {
+      background-color: #fff;
+      margin: 10px;
+      padding: 20px;
+      width: 250px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .developer img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .developer h3 {
+      margin: 10px 0 5px;
+    }
+    .developer p {
+      margin: 0;
+      font-size: 0.9em;
+      color: #666;
+    }
+    /* Footer */
+    footer {
+      background-color: #1d2671;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Banner at Top -->
+  <header>
+    <div class="banner">
+      <h1>Speech to Sign Animation Converter</h1>
+    </div>
+  </header>
+
+  <!-- Navigation Bar -->
+  <nav>
+    <a href="/">Home</a>
+    <a href="/converter">Speech To Sign</a>
+    <a href="/model2">Sign To Speech</a>
+    <a href="/about">About Us</a>
+    <a href="/contact">Contact Us</a>
+    <a href="/register">User Login</a>
+  </nav>
+
+  <!-- Slogan Section -->
+  <section class="slogan">
+    <p>Bridging the gap between spoken words and sign language</p>
+  </section>
+
+  <!-- Features Section: GIF and Bullet Points -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="gif">
+        <img src="{{ url_for('static', filename='/asset/nicetomeet.gif') }}" alt="Animated Sign Language Conversion" width="280" height="300" />
+      </div>
+      <div class="feature-details">
+        <ul>
+          <li>Real-time conversion of speech to sign animations</li>
+          <li>Accurate and responsive sign language rendering</li>
+          <li>User-friendly and accessible interface</li>
+          <li>Advanced AI for contextual understanding</li>
+          <li>Seamless integration with various platforms</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call-to-Action (CTA) Section -->
+  <section class="cta">
+    <p>Empowering communication through innovative technology</p>
+    <img src="{{ url_for('static', filename='/asset/ai.jpg') }}" alt="Technology Innovation" width="500" />
+    <button id="learnMore" href="/about" >Learn More</button>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="how-it-works">
+    <h2>How It Works</h2>
+    <p>
+      Our advanced AI-powered system listens to spoken language, processes it in real-time, and converts it into accurate and fluid sign language animations.
+      This ensures seamless communication for individuals with hearing impairments.
+    </p>
+    <img src="{{ url_for('static', filename='/asset/workflow.png') }}" alt="Technology Workflow" width="500" />
+  </section>
+
+  <!-- Developer Section -->
+  <section class="developers" id="developers">
+    <h2>Meet the Developer</h2>
+    <div class="dev-profiles">
+      <div class="developer">
+        <img src="{{ url_for('static', filename='/asset/developer.jpg') }}" alt="Developer Profile" />
+        <h3>VIGNESH G</h3>
+        <p>Founder &amp; Developer</p>
+        <p>+91 8525822546</p>
+      </div>
+      <div class="developer">
+        <img src="{{ url_for('static', filename='/asset/developer.jpg') }}" alt="Developer Profile" />
+        <h3>VIGNESH G</h3>
+        <p>Founder &amp; Developer</p>
+        <p>+91 8525822546</p>
+      </div>
+      <div class="developer">
+        <img src="{{ url_for('static', filename='/asset/developer.jpg') }}" alt="Developer Profile" />
+        <h3>VIGNESH G</h3>
+        <p>Founder &amp; Developer</p>
+        <p>+91 8525822546</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="contact">
+    <p>&copy; 2025 Speech to Sign Animation Converter. All Rights Reserved.</p>
+  </footer>
+
+  <script>
+    // Inline JavaScript for interactive functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("Welcome to the Speech to Sign Animation Converter!");
+      document.getElementById('learnMore').addEventListener('click', function() {
+        document.querySelector('.developers').scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>
