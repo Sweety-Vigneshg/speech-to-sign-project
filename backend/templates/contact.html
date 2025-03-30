@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Us</title>
+    <!-- Add Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <style>
-        /* General Styling */
-        body {
+         /* General Styling */
+         body {
             margin: 0;
             font-family: Arial, sans-serif;
             background: #f7f7f7; 
@@ -41,50 +44,71 @@
       border-radius: 5px;
     }
 
-        /* Contact Container */
-        .contact-container {
+    /* Modified Contact Container */
+    .contact-container {
             display: flex;
-            width: 80%;
-            max-width: 1000px;
+            width: 85%;
+            max-width: 900px; /* Reduced from 1000px */
             background: #fff;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-            margin: 100px auto;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin: 50px auto; /* Reduced from 100px */
+            min-height: 400px; /* Added for consistent height */
         }
 
-        /* Left Section */
+        /* Left Section Improvements */
         .left-section {
             background: linear-gradient(135deg, #1d2671, #c33764);
-            color: white;
             flex: 1;
-            padding: 50px;
-            text-align: center;
+            padding: 30px; /* Reduced from 50px */
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: center;
+            text-align: center;
+            position: relative;
         }
 
         .left-section img {
-            width: 400px;
-            height: 350px;
+            width: 320px; /* Slightly reduced size */
+            height: auto;
+            margin: 20px auto 0;
+            display: block;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
-        /* Right Section (Form) */
+        .left-section h2 {
+            color: #fff;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .left-section p {
+            color: rgba(255,255,255,0.9);
+            line-height: 1.6;
+            font-size: 0.95em;
+            max-width: 90%;
+            margin: 0 auto;
+        }
+
+        /* Right Section Adjustments */
         .right-section {
             flex: 1;
-            padding: 40px;
+            padding: 30px; /* Reduced from 40px */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .right-section h2 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            color: #1d2671;
         }
 
         .input-field {
-            width: 100%;
+            width: 96%;
             padding: 10px;
             margin: 10px 0;
             border: 1px solid #ccc;
@@ -121,27 +145,62 @@
       text-align: center;
       padding: 5px;
     }
+     /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .contact-container {
                 flex-direction: column;
+                margin: 30px auto;
+                width: 90%;
             }
 
-            .left-section {
-                padding: 30px;
-            }
-
+            .left-section,
             .right-section {
-                padding: 30px;
+                padding: 25px;
             }
 
             .left-section img {
-                width: 200px;
+                width: 250px;
+                margin-top: 15px;
             }
+
+            .left-section h2 {
+                font-size: 1.5em;
+            }
+
+            .right-section h2 {
+                font-size: 1.6em;
+                margin-bottom: 20px;
+            }
+        }
+        /* Add toast styles */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .toast.visible {
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: #4CAF50;
+        }
+
+        .toast.error {
+            background: #f44336;
         }
     </style>
 </head>
 <body>
-
     <!-- Banner -->
   <header>
     <div class="banner">
@@ -159,24 +218,22 @@
       </nav>
 
     <div class="contact-container">
-        <!-- Left Side (GIF Animation) -->
         <div class="left-section">
             <h2>Contact Us</h2>
             <p>We’d love to hear from you! Reach out with any questions or feedback.</p>
             <img src="{{ url_for('static', filename='/asset/contactusgif.gif') }}" alt="Animated GIF">
         </div>
 
-        <!-- Right Side (Form) -->
         <div class="right-section">
             <h2>Get in Touch</h2>
             <form id="contactForm">
-                <input type="text" id="name" class="input-field" placeholder="Your Name">
+                <input type="text" id="name" class="input-field" placeholder="Your Name" required>
                 <p class="error-message" id="nameError">Please enter your name</p>
 
-                <input type="email" id="email" class="input-field" placeholder="Your Email">
+                <input type="email" id="email" class="input-field" placeholder="Your Email" required>
                 <p class="error-message" id="emailError">Please enter a valid email</p>
 
-                <textarea id="message" class="input-field" placeholder="Your Message" rows="4"></textarea>
+                <textarea id="message" class="input-field" placeholder="Your Message" rows="4" required></textarea>
                 <p class="error-message" id="messageError">Message cannot be empty</p>
 
                 <button type="submit" class="submit-btn">Send Message</button>
@@ -184,49 +241,96 @@
         </div>
     </div>
 
-    <!-- Footer (Same as Index & About Us) -->
+    <!-- Toast container -->
+    <div id="toast" class="toast"></div>
+
+        <!-- Footer (Same as Index & About Us) -->
    <footer>
     <p>&copy; 2025 Speech to Sign Animation Converter. All Rights Reserved.</p>
   </footer>
 
     <script>
-        document.getElementById('contactForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDzdfP1QpXlecw-mk38G6E7Vkb-pfJr540",
+            authDomain: "web-development-project-site.firebaseapp.com",
+            projectId: "web-development-project-site",
+            storageBucket: "web-development-project-site.appspot.com",
+            messagingSenderId: "465762016992",
+            appId: "1:465762016992:web:45ca218c3b0ff2062d7a85",
+            measurementId: "G-CRBT4ZY4JQ"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const contactRef = db.collection("Speech-to-Sign-Contact");
+
+        // Toast function
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} visible`;
+            
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, 3000);
+        }
+
+        // Form validation and submission
+        document.getElementById('contactForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
 
             // Clear previous errors
-            document.getElementById('nameError').style.display = 'none';
-            document.getElementById('emailError').style.display = 'none';
-            document.getElementById('messageError').style.display = 'none';
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.style.display = 'none';
+            });
 
-            let name = document.getElementById('name').value.trim();
-            let email = document.getElementById('email').value.trim();
-            let message = document.getElementById('message').value.trim();
-            let valid = true;
+            // Get form values
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const message = document.getElementById('message').value.trim();
 
-            // Name Validation
-            if (name === '') {
+            // Validation
+            let isValid = true;
+
+            if (!name) {
                 document.getElementById('nameError').style.display = 'block';
-                valid = false;
+                isValid = false;
             }
 
-            // Email Validation
-            if (email === '' || !email.includes('@')) {
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                 document.getElementById('emailError').style.display = 'block';
-                valid = false;
+                isValid = false;
             }
 
-            // Message Validation
-            if (message === '') {
+            if (!message) {
                 document.getElementById('messageError').style.display = 'block';
-                valid = false;
+                isValid = false;
             }
 
-            if (valid) {
-                alert('Message Sent Successfully!');
+            if (!isValid) return;
+
+            try {
+                // Add to Firestore
+                await contactRef.add({
+                    name: name,
+                    email: email,
+                    message: message,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Show success toast
+                showToast('Message sent successfully!', 'success');
+                
+                // Reset form
                 document.getElementById('contactForm').reset();
+
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                showToast('Failed to send message. Please try again.', 'error');
             }
         });
     </script>
-
 </body>
 </html>
