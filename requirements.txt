@@ -5,6 +5,5 @@ mediapipe==0.10.10
 numpy==1.26.4
 pyttsx3==2.90
 tensorflow-cpu
-tensorflow==2.15.1
 pyspellchecker==0.8.1
 python-dotenv==1.0.1
