@@ -21,6 +21,24 @@
             background: #f0f2f5;
             min-height: 100vh;
         }
+         /* Navigation Bar */
+    nav {
+      background-color: #48519e;
+      text-align: center;
+      padding: 10px 0;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 20px;
+      display: inline-block;
+      font-size: 1.1em;
+      transition: background 0.3s ease;
+    }
+    nav a:hover {
+      background: #c33764;
+      border-radius: 5px;
+    }
 
         .admin-container {
             max-width: 1200px;
@@ -176,6 +194,15 @@
     </style>
 </head>
 <body>
+     <!-- Navigation Bar -->
+  <nav>
+    <a href="/">Home</a>
+    <a href="/converter">Speech To Sign</a>
+    <a href="/model2">Sign To Speech</a>
+    <a href="/about">About Us</a>
+    <a href="/contact">Contact Us</a>
+    <a href="/register">User Login</a>
+  </nav>
     <!-- EXISTING HTML -->
     <div class="admin-container">
         <h1>Admin Dashboard</h1>
