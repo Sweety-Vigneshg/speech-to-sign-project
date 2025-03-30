@@ -254,7 +254,7 @@ header .banner {
                 await db.collection('Speech-to-Sign-Users').doc(user.uid).set({
                     name: name,
                     email: email,
-                    role: 'admin',
+                    role: 'user',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
