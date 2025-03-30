@@ -188,9 +188,9 @@
 
         // Check admin status
         auth.onAuthStateChanged(async (user) => {
-            if (!user) window.location.href = '/login';
+            if (!user) window.location.href = '/register';
             
-            const userDoc = await db.collection('APP_Users').doc(user.uid).get();
+            const userDoc = await db.collection('Speech-to-Sign-Users').doc(user.uid).get();
             if (!userDoc.exists || userDoc.data().role !== 'admin') {
                 window.location.href = '/';
             } else {
@@ -200,7 +200,7 @@
 
         async function loadData() {
             // Load users
-            db.collection('APP_Users').onSnapshot(async (snapshot) => {
+            db.collection('Speech-to-Sign-Users').onSnapshot(async (snapshot) => {
                 const users = [];
                 snapshot.forEach(doc => {
                     users.push({ id: doc.id, ...doc.data() });
@@ -255,7 +255,7 @@
 
         async function deleteUser(userId) {
             if (confirm('Are you sure you want to delete this user?')) {
-                await db.collection('APP_Users').doc(userId).delete();
+                await db.collection('Speech-to-Sign-Users').doc(userId).delete();
             }
         }
 
