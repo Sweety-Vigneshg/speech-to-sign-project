@@ -1,3 +1,5 @@
+pip install gunicorn
+pip freeze > requirements.txt
 Flask==3.0.2
 opencv-python==4.9.0.80
 mediapipe==0.10.10
