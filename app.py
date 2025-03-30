@@ -1,24 +1,32 @@
-from flask import Flask, render_template,  send_from_directory, request, jsonify, Response
+from flask import Flask, render_template, send_from_directory, request, jsonify, Response
 import os
 import cv2
 import mediapipe as mp
+from spellchecker import SpellChecker
 import numpy as np
 import time
 import pyttsx3
+from threading import Lock
 
 app = Flask(__name__)
 
+# Initialize thread-safe lock for TTS engine
+tts_lock = Lock()
 
 # MODEL 1 CODE
-
 VIDEO_FOLDER = os.path.join("static", "signs")
 app.config["VIDEO_FOLDER"] = VIDEO_FOLDER
 
-# Alphabet fallback (A-Z sign videos)
+# Alphabet fallback (A-Z sign videos) - Ensure these files exist
 ALPHABET_MAP = {chr(i): f"{chr(i).upper()}.mp4" for i in range(97, 123)}
+VIDEO_MAP = {
+    "hello": "Hello.mp4",
+    "world": "World.mp4",
+    # Add more word mappings here
+}  
 
 @app.route('/translate', methods=['POST'])
-def translate():
+def translate_sentence():
     data = request.get_json()
     sentence = data.get("sentence", "").strip().lower()
     
@@ -31,16 +39,23 @@ def translate():
         if word in VIDEO_MAP:
             video_files.append(f"/static/signs/{VIDEO_MAP[word]}")
         else:
-            video_files.extend(f"/static/signs/{ALPHABET_MAP[char]}" for char in word if char in ALPHABET_MAP)
+            # Handle unknown words with character breakdown
+            for char in word:
+                if char in ALPHABET_MAP:
+                    video_path = f"/static/signs/{ALPHABET_MAP[char]}"
+                    if os.path.exists(os.path.join(VIDEO_FOLDER, ALPHABET_MAP[char])):
+                        video_files.append(video_path)
 
     if not video_files:
         video_files.append("/static/signs/Talk.mp4")
 
     return jsonify({"videos": video_files})
 
+@app.route('/static/signs/<path:filename>')
+def serve_signs_video(filename):
+    return send_from_directory(VIDEO_FOLDER, filename)
 
 # MODEL 11 CODE
-
 VIDEO_DIR = "static/signs2"
 
 def get_video_files(word):
@@ -49,59 +64,40 @@ def get_video_files(word):
         filename = f"{char}.mp4"
         filepath = os.path.join(VIDEO_DIR, filename)
         if os.path.exists(filepath):
-            videos.append(filename)
+            videos.append(f"/static/signs2/{filename}")
     return videos
 
-@app.route('/translate')
-def translate1():
-    word = request.args.get('word', '').lower() 
-    videos = get_video_files(word)  
+@app.route('/translate_word')
+def translate_word():
+    word = request.args.get('word', '').lower().strip()
+    if not word:
+        return jsonify({"videos": []})
+    
+    videos = get_video_files(word)
     return jsonify({"videos": videos})
 
 @app.route('/static/signs2/<path:filename>')
-def serve_video(filename):
+def serve_signs2_video(filename):
     return send_from_directory(VIDEO_DIR, filename)
 
-
 # MODEL 2 CODE
-
-from flask import Flask, render_template, Response, jsonify
-import cv2
-import numpy as np
-import mediapipe as mp
-import tensorflow as tf
-from spellchecker import SpellChecker  # For autocorrection
-import pyttsx3  # For text-to-speech
-import time  # For time-based delay
-
-app = Flask(__name__)
-
-# Load trained model
-model = tf.keras.models.load_model("sign_model.h5")
-
-# Load class labels (A-Z)
-labels = {i: chr(65 + i) for i in range(26)}  # Assuming A-Z (26 classes)
-
-# Initialize Mediapipe Hands
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
-hands = mp_hands.Hands(static_image_mode=False, max_num_hands=1, 
-                       min_detection_confidence=0.8, min_tracking_confidence=0.8)
+hands = mp_hands.Hands(
+    static_image_mode=False,
+    max_num_hands=1,
+    min_detection_confidence=0.8,
+    min_tracking_confidence=0.8
+)
 
-# Global variables for text and detection state
+# Global variables with thread safety
 detected_text = ""
 full_text = ""
 is_running = True
-last_detection_time = time.time()  # Track the last detection time
-detection_delay = 1.5  # Delay in seconds between detections
-
-# Initialize spell checker
+last_detection_time = time.time()
+detection_delay = 1.5
 spell = SpellChecker()
 
-# Initialize text-to-speech engine
-engine = pyttsx3.init()
-
-# Function to detect manual hand signs
 def detect_manual_sign(hand_landmarks):
     # Extract landmark positions
     landmarks = []
@@ -368,93 +364,84 @@ def detect_manual_sign(hand_landmarks):
 
     return None  # No manual sign detected
 
-# Function to generate video feed
 def generate_frames():
     global detected_text, full_text, is_running, last_detection_time
     cap = cv2.VideoCapture(0)
-
+    
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
             break
 
         if is_running:
-            # Flip image horizontally for natural view
             frame = cv2.flip(frame, 1)
-
-            # Convert frame to RGB (for Mediapipe)
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             results = hands.process(rgb_frame)
 
             if results.multi_hand_landmarks:
                 for hand_landmarks in results.multi_hand_landmarks:
-                    # Detect manual sign
                     predicted_sign = detect_manual_sign(hand_landmarks)
-
                     if predicted_sign:
                         current_time = time.time()
-                        # Append the sign only if the delay has passed
                         if current_time - last_detection_time >= detection_delay:
                             detected_text = predicted_sign
-                            full_text += predicted_sign  # Append to full text
-                            last_detection_time = current_time  # Update last detection time
-
-                    # Draw Hand Landmarks
+                            full_text += predicted_sign
+                            last_detection_time = current_time
                     mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
-            # Display Prediction
-            cv2.putText(frame, f"Sign: {detected_text}", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-            cv2.putText(frame, f"Full Text: {full_text}", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            cv2.putText(frame, f"Sign: {detected_text}", (50, 50), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            cv2.putText(frame, f"Full Text: {full_text}", (50, 100), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-        # Encode frame to JPEG
         ret, buffer = cv2.imencode('.jpg', frame)
-        frame = buffer.tobytes()
-
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
+        yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + buffer.tobytes() + b'\r\n')
+    
     cap.release()
 
-# Route for video feed
 @app.route('/video_feed')
 def video_feed():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-# Route to detect sign
 @app.route('/detect_sign')
 def detect_sign():
     global full_text
-    corrected_text = " ".join([spell.correction(word) for word in full_text.split()])  # Autocorrect the full text
-    return jsonify({'text': corrected_text})
+    try:
+        corrected = " ".join([spell.correction(word) or word for word in full_text.split()])
+        return jsonify({'text': corrected})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-# Route to stop detection
 @app.route('/stop')
 def stop_detection():
     global is_running
     is_running = False
     return jsonify({'status': 'stopped'})
 
-# Route to restart detection
 @app.route('/restart')
 def restart_detection():
     global is_running, detected_text, full_text, last_detection_time
     is_running = True
     detected_text = ""
     full_text = ""
-    last_detection_time = time.time()  # Reset the last detection time
-    
+    last_detection_time = time.time()
     return jsonify({'status': 'restarted'})
 
-# Route to speak text
 @app.route('/speak')
 def speak_text():
     global full_text
-    corrected_text = " ".join([spell.correction(word) for word in full_text.split()])  # Autocorrect the full text
-    engine.say(corrected_text)  # Speak the corrected text
-    engine.runAndWait()
-    return jsonify({'status': 'spoken'})
+    try:
+        with tts_lock:
+            engine = pyttsx3.init()
+            corrected = " ".join([spell.correction(word) or word for word in full_text.split()])
+            engine.say(corrected)
+            engine.runAndWait()
+            engine.stop()
+        return jsonify({'status': 'spoken'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-# Routes HTML Pages
+# HTML Routes (Unchanged)
 @app.route('/')
 def index():
     return render_template("index.html")
@@ -487,5 +474,9 @@ def register():
 def converter():
     return render_template("converter.html")
 
+@app.route('/admin')
+def admin():
+    return render_template("admin.html")
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)
