@@ -80,7 +80,9 @@ def translate_word():
 def serve_signs2_video(filename):
     return send_from_directory(VIDEO_DIR, filename)
 
+
 # MODEL 2 CODE
+
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 hands = mp_hands.Hands(
